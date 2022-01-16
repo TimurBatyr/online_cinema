@@ -2,12 +2,22 @@ from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, viewsets, status
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Genre, Movie, Image
 from .serializers import GenreSerializer, MovieSerializer, ImageSerializer
+from .permissions import IsAuthorPermission
+
+
+class PermissionMixin:
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy', ]:
+            permissions = [IsAdminUser, ]
+        else:
+            permissions = [IsAuthenticated, ]
+        return [permission() for permission in permissions]
 
 
 class GenreListView(generics.ListAPIView):
@@ -23,10 +33,13 @@ class MovieListView(generics.ListAPIView):
 
 
 #CRUD
-class MovieViewSet(viewsets.ModelViewSet): #PermissionMixin,
+class MovieViewSet(PermissionMixin, viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
-    # queryset_any = Favorite.objects.all()
+
+    # def get_serializer_context(self):
+    #     return {'request': self.request}
+
 
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def search(self, request, pk=None):             # /search/?q=xxx

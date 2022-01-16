@@ -19,13 +19,11 @@ class MovieSerializer(serializers.ModelSerializer):
 
     # def create(self, validated_data):
     #     request = self.context.get('request')
-    #     images_data = request.FILES
-    #     author = request.user
-    #     movie = Movie.objects.create(author=author, **validated_data)
-    #     for image in images_data.getlist('images'):
-    #         Image.objects.create(image=image, movie=movie)
+    #     user_id = request.user.id
+    #     validated_data['owner_id'] = user_id
+    #     movie = Movie.objects.create(**validated_data)
     #     return movie
-    #
+
     # def update(self, instance, validated_data):
     #     request = self.context.get('request')
     #     for key, value in validated_data.items():
@@ -39,7 +37,7 @@ class MovieSerializer(serializers.ModelSerializer):
     #
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-    #     representation['author'] = instance.owner.email
+        # representation['owner'] = instance.owner.email
         representation['images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
     #     representation['comments'] = CommentSerializer(instance.comments.all(), many=True).data
     #     representation['likes'] = instance.likes.all().count()
