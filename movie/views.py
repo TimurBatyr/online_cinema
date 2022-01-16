@@ -1,24 +1,46 @@
+from django.db.models import Q
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics, viewsets, status
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from django.shortcuts import render
-from rest_framework import generics, permissions
-from django_filters import rest_framework as filters
-
-from movie import serializers
-from movie.models import Genre, Movie
+from .models import Genre, Movie, Image
+from .serializers import GenreSerializer, MovieSerializer, ImageSerializer
 
 
-class GenreListCreateView(generics.ListCreateAPIView):
+class GenreListView(generics.ListAPIView):
     queryset = Genre.objects.all()
-    serializer_class = serializers.GenreSerializer
+    serializer_class = GenreSerializer
 
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+class MovieListView(generics.ListAPIView):
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+    # filter_backends = [DjangoFilterBackend]
+    # filterset_fields = ['genre', ]
 
 
-class GenreDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Genre.objects.all()
-    serializer_class = serializers.GenreSerializer
+#CRUD
+class MovieViewSet(viewsets.ModelViewSet): #PermissionMixin,
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+    # queryset_any = Favorite.objects.all()
+
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def search(self, request, pk=None):             # /search/?q=xxx
+        q = request.query_params.get('q')
+        queryset = self.get_queryset()
+        queryset = queryset.filter(Q(title__icontains=q) | Q(description__icontains=q))
+        serializer = MovieSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+#CRUD
+class MovieImagesViewSet(viewsets.ModelViewSet):
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer
 
+    # def get_serializer_context(self):
+    #     return {'request': self.request}
