@@ -3,6 +3,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,6 +11,16 @@ from rest_framework.views import APIView
 from .models import Genre, Movie, Image
 from .serializers import GenreSerializer, MovieSerializer, ImageSerializer
 from .permissions import IsAuthorPermission
+
+
+# class MyPaginationClass(PageNumberPagination):
+#     page_size = 4
+#
+#     def get_paginated_response(self, data):
+#         for i in range(self.page_size):
+#             text = data[i]['description']
+#             data[i]['description'] = text[:20] + '...'
+#         return super().get_paginated_response(data)
 
 
 class PermissionMixin:
