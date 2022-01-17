@@ -17,31 +17,10 @@ class MovieSerializer(serializers.ModelSerializer):
         fields = '__all__'
         # exclude = ('owner', )
 
-    # def create(self, validated_data):
-    #     request = self.context.get('request')
-    #     user_id = request.user.id
-    #     validated_data['owner_id'] = user_id
-    #     movie = Movie.objects.create(**validated_data)
-    #     return movie
-
-    # def update(self, instance, validated_data):
-    #     request = self.context.get('request')
-    #     for key, value in validated_data.items():
-    #         setattr(instance, key, value)
-    #     instance.save()
-    #     images_data = request.FILES
-    #     instance.images.all().delete()
-    #     for image in images_data.getlist('images'):
-    #         Image.objects.create(image=image, movie=instance)
-    #     return instance
-    #
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         # representation['owner'] = instance.owner.email
         representation['images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
-    #     representation['comments'] = CommentSerializer(instance.comments.all(), many=True).data
-    #     representation['likes'] = instance.likes.all().count()
-    #     representation['rating'] = instance.rating.aggregate(Avg('rating'))
         return representation
 
 
