@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_rest_passwordreset',
+    'django_filters',
 
     #myapps
     'account',
@@ -153,5 +154,6 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-    ]
+    ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
