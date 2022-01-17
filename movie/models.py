@@ -30,3 +30,27 @@ class Movie(models.Model):
 class Image(models.Model):
     image = models.ImageField(upload_to='images')
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='images')
+
+
+RATING_CHOICES = (
+    (1, '1'),
+    (2, '2'),
+    (3, '3'),
+    (4, '4'),
+    (5, '5'),
+)
+
+
+class Review(models.Model):
+    rating = models.IntegerField(choices=RATING_CHOICES, blank=True, null=True)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='reviews')
+    owner = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='reviews')
+    review = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.review)
+
+    class Meta:
+        ordering = ('-created_at',)

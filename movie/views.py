@@ -3,13 +3,15 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
+from rest_framework.generics import GenericAPIView
+from rest_framework.mixins import CreateModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Genre, Movie, Image
-from .serializers import GenreSerializer, MovieSerializer, ImageSerializer
+from .models import Genre, Movie, Image, Review
+from .serializers import GenreSerializer, MovieSerializer, ImageSerializer, ReviewSerializer
 from .permissions import IsAuthorPermission
 
 
@@ -71,3 +73,30 @@ class MovieImagesViewSet(viewsets.ModelViewSet):
 
     # def get_serializer_context(self):
     #     return {'request': self.request}
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthorPermission]
+
+    # def get_serializer_context(self):
+    #     return {'request': self.request}
+
+
+# class UpdateDeleteReview(UpdateModelMixin, DestroyModelMixin, GenericAPIView):
+#     queryset = Review.objects.all()
+#     serializer_class = ReviewSerializer
+#     permission_classes = [IsAuthorPermission]
+#
+#     def get_serializer_context(self):
+#         return {'request': self.request}
+#
+#     def put(self, request, *args, **kwargs):
+#         return self.update(request, *args, **kwargs)
+#
+#     def patch(self, request, *args, **kwargs):
+#         return self.partial_update(request, *args, **kwargs)
+#
+#     def delete(self, request, *args, **kwargs):
+#         return self.destroy(request, *args, **kwargs)

@@ -22,7 +22,7 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 
-from movie.views import GenreListView, MovieListView, MovieViewSet, MovieImagesViewSet
+from movie.views import GenreListView, MovieListView, MovieViewSet, MovieImagesViewSet, ReviewViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -37,6 +37,7 @@ schema_view = get_schema_view(
 router = DefaultRouter()
 router.register('movies', MovieViewSet)
 router.register('images', MovieImagesViewSet)
+router.register('reviews', ReviewViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -45,4 +46,6 @@ urlpatterns = [
     path('api/v1/movie/', MovieListView.as_view()),
     path('api/v1/account/', include('account.urls')),
     path('api/v1/', include(router.urls)),
+    # path('api/v1/reviews/', UpdateDeleteReview.as_view()),
+    # path('api/v1/reviews/<int:pk>/', UpdateDeleteReview.as_view())
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

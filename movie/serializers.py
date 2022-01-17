@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Genre, Movie, Image
+from .models import Genre, Movie, Image, Review
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -21,6 +21,7 @@ class MovieSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         # representation['owner'] = instance.owner.email
         representation['images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
+        representation['reviews'] = ReviewSerializer(instance.reviews.all(), many=True).data
         return representation
 
 
@@ -44,3 +45,23 @@ class ImageSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['image'] = self._get_image_url(instance)
         return representation
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(format='%d/%m/%Y %H:%M:%S', read_only=True)
+    owner = serializers.ReadOnlyField(source='owner.email')
+
+    class Meta:
+        model = Review
+        fields = '__all__'
+
+    def create(self, validated_data):
+        # context это {}, из вьюшки передаем в сериалайзер
+        request = self.context.get('request')
+        owner = request.user
+        review = Review.objects.create(owner=owner, **validated_data)
+        return review
+        # movie = self.context.get('movie')
+        # validated_data['user'] = owner
+        # validated_data['product'] = movie
+        # return super().create(validated_data)
