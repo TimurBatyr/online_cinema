@@ -17,9 +17,22 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 
 from movie.views import GenreListView, MovieListView, MovieViewSet, MovieImagesViewSet
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title='Online_Cinema API',
+        description='Cinema',
+        default_version='v1'
+    ),
+    public=True,
+    # permission_classes=(permissions.AllowAny, )
+)
 
 router = DefaultRouter()
 router.register('movies', MovieViewSet)
@@ -27,6 +40,7 @@ router.register('images', MovieImagesViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/v1/docs/', schema_view.with_ui('swagger')),
     path('api/v1/genres/', GenreListView.as_view()),
     path('api/v1/movie/', MovieListView.as_view()),
     path('api/v1/account/', include('account.urls')),
