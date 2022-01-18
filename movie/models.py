@@ -54,3 +54,17 @@ class Review(models.Model):
 
     class Meta:
         ordering = ('-created_at',)
+
+
+# class Favorite(models.Model):
+#     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='favourites')
+#     owner = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='favourites')
+#     favorite = models.BooleanField(default=True)
+
+class Likes(models.Model):
+    likes = models.BooleanField(default=False)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='likes')
+    owner = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='likes')
+
+    def __str__(self):
+        return str(self.likes)

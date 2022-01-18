@@ -10,9 +10,9 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Genre, Movie, Image, Review
-from .serializers import GenreSerializer, MovieSerializer, ImageSerializer, ReviewSerializer
-from .permissions import IsAuthorPermission
+from .models import Genre, Movie, Image, Review, Likes
+from .serializers import GenreSerializer, MovieSerializer, ImageSerializer, ReviewSerializer, LikesSerializer
+from .permissions import IsAuthorPermission, PermissionMixin
 
 
 # class MyPaginationClass(PageNumberPagination):
@@ -23,15 +23,6 @@ from .permissions import IsAuthorPermission
 #             text = data[i]['description']
 #             data[i]['description'] = text[:20] + '...'
 #         return super().get_paginated_response(data)
-
-
-class PermissionMixin:
-    def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy', ]:
-            permissions = [IsAdminUser, ]
-        else:
-            permissions = [IsAuthenticated, ]
-        return [permission() for permission in permissions]
 
 
 class GenreListView(generics.ListAPIView):
@@ -64,6 +55,23 @@ class MovieViewSet(PermissionMixin, viewsets.ModelViewSet):
     #     queryset = queryset.filter(Q(title__icontains=q) | Q(description__icontains=q))
     #     serializer = MovieSerializer(queryset, many=True, context={'request': request})
     #     return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    # def favorites(self, request):
+    #     queryset = Favorite.objects.all()
+    #     queryset = queryset.filter(owner=request.user)
+    #     serializer = FavoriteSerializer(queryset, many=True, context={'request': request})
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+    #
+    # @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    # def favorite(self, request, pk=None):
+    #     movie = self.get_object()
+    #     obj, created = Favorite.objects.get_or_create(owner=request.user, movie=movie, )
+    #     if not created:
+    #         obj.favorite = not obj.favorite
+    #         obj.save()
+    #     favorites = 'added to favorites' if obj.favorite else 'removed from favorites'
+    #     return Response(f'Successfully {favorites}', status=status.HTTP_200_OK)
 
 
 #CRUD
@@ -100,3 +108,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 #
 #     def delete(self, request, *args, **kwargs):
 #         return self.destroy(request, *args, **kwargs)
+
+class LikesViewSet(viewsets.ModelViewSet):
+    queryset = Likes.objects.all()
+    serializer_class = LikesSerializer
+    permission_classes = [IsAuthorPermission]

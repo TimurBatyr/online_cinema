@@ -22,7 +22,7 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 
-from movie.views import GenreListView, MovieListView, MovieViewSet, MovieImagesViewSet, ReviewViewSet
+from movie.views import GenreListView, MovieListView, MovieViewSet, MovieImagesViewSet, ReviewViewSet, LikesViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -38,6 +38,7 @@ router = DefaultRouter()
 router.register('movies', MovieViewSet)
 router.register('images', MovieImagesViewSet)
 router.register('reviews', ReviewViewSet)
+router.register('likes', LikesViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

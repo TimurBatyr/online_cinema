@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Genre, Movie, Image, Review
+from .models import Genre, Movie, Image, Review, Likes
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -22,6 +22,7 @@ class MovieSerializer(serializers.ModelSerializer):
         # representation['owner'] = instance.owner.email
         representation['images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
         representation['reviews'] = ReviewSerializer(instance.reviews.all(), many=True).data
+        representation['likes'] = instance.likes.all().count()
         return representation
 
 
@@ -65,3 +66,32 @@ class ReviewSerializer(serializers.ModelSerializer):
         # validated_data['user'] = owner
         # validated_data['product'] = movie
         # return super().create(validated_data)
+
+
+# class FavoriteSerializer(serializers.ModelSerializer):
+#
+#     class Meta:
+#         model = Favorite
+#         fields = '__all__'
+#
+#     def to_representation(self, instance):
+#         representation = super().to_representation(instance)
+#         representation['owner'] = instance.user.email
+#         representation['movie'] = instance.movie.title
+#         return representation
+
+class LikesSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.email')
+
+    class Meta:
+        model = Likes
+        fields = '__all__'
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        owner = request.user
+        movie = validated_data.get('movie')
+        like = Likes.objects.get_or_create(owner=owner, movie=movie)[0]
+        like.likes = True if like.likes is False else False
+        like.save()
+        return like
