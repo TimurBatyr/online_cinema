@@ -125,7 +125,7 @@ class RatingViewSet(viewsets.ModelViewSet):
 class FavoritesCreateView(generics.CreateAPIView):
     queryset = Favorites.objects.all()
     serializer_class = FavoritesSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -145,13 +145,13 @@ class FavoritesCreateView(generics.CreateAPIView):
 class FavoritesListView(generics.ListAPIView):
     queryset = Favorites.objects.all()
     serializer_class = FavoritesSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class FavoriteDetailView(generics.RetrieveDestroyAPIView):
     queryset = Favorites.objects.all()
     serializer_class = FavoritesSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 
