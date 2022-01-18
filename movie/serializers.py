@@ -1,6 +1,7 @@
+from django.db.models import Avg
 from rest_framework import serializers
 
-from .models import Genre, Movie, Image, Review, Likes
+from .models import Genre, Movie, Image, Review, Likes, Rating, Favorites
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -23,6 +24,7 @@ class MovieSerializer(serializers.ModelSerializer):
         representation['images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
         representation['reviews'] = ReviewSerializer(instance.reviews.all(), many=True).data
         representation['likes'] = instance.likes.all().count()
+        representation['rating'] = instance.rating.aggregate(Avg('rating'))
         return representation
 
 
@@ -67,7 +69,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         # validated_data['product'] = movie
         # return super().create(validated_data)
 
-
+#
 # class FavoriteSerializer(serializers.ModelSerializer):
 #
 #     class Meta:
@@ -76,9 +78,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 #
 #     def to_representation(self, instance):
 #         representation = super().to_representation(instance)
-#         representation['owner'] = instance.user.email
+#         representation['owner'] = instance.owner.email
 #         representation['movie'] = instance.movie.title
 #         return representation
+
 
 class LikesSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
@@ -95,3 +98,29 @@ class LikesSerializer(serializers.ModelSerializer):
         like.likes = True if like.likes is False else False
         like.save()
         return like
+
+
+class RatingSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.email')
+
+    class Meta:
+        model = Rating
+        fields = '__all__'
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        owner = request.user
+        movie = validated_data.get('movie')
+        rating = Rating.objects.get_or_create(owner=owner, movie=movie)[0]
+        rating.rating = validated_data['rating']
+        rating.save()
+        return rating
+
+
+class FavoritesSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.email')
+
+    class Meta:
+        model = Favorites
+        fields = ('id', 'movie', 'favorites', 'owner',)
+

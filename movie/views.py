@@ -6,12 +6,13 @@ from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import CreateModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Genre, Movie, Image, Review, Likes
-from .serializers import GenreSerializer, MovieSerializer, ImageSerializer, ReviewSerializer, LikesSerializer
+from .models import Genre, Movie, Image, Review, Likes, Rating, Favorites
+from .serializers import GenreSerializer, MovieSerializer, ImageSerializer, ReviewSerializer, LikesSerializer, \
+    RatingSerializer, FavoritesSerializer
 from .permissions import IsAuthorPermission, PermissionMixin
 
 
@@ -63,7 +64,7 @@ class MovieViewSet(PermissionMixin, viewsets.ModelViewSet):
     #     serializer = FavoriteSerializer(queryset, many=True, context={'request': request})
     #     return Response(serializer.data, status=status.HTTP_200_OK)
     #
-    # @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    # @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     # def favorite(self, request, pk=None):
     #     movie = self.get_object()
     #     obj, created = Favorite.objects.get_or_create(owner=request.user, movie=movie, )
@@ -113,3 +114,46 @@ class LikesViewSet(viewsets.ModelViewSet):
     queryset = Likes.objects.all()
     serializer_class = LikesSerializer
     permission_classes = [IsAuthorPermission]
+
+
+class RatingViewSet(viewsets.ModelViewSet):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer
+    permission_classes = [IsAuthorPermission]
+
+
+class FavoritesCreateView(generics.CreateAPIView):
+    queryset = Favorites.objects.all()
+    serializer_class = FavoritesSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    def get_queryset(self):
+        qs = self.request.user
+        queryset = Favorites.objects.filter(owner=qs, favorites=True)
+        return queryset
+
+    # def create(self, *args, **kwargs):
+    #     serializer = self.serializer_class
+    #     data = serializer.data
+    #     Favorites.objects.create(owner=self.request.user, movie=int(self.request.POST.get('movie')))
+    #     return Response(status='it ok')
+
+
+class FavoritesListView(generics.ListAPIView):
+    queryset = Favorites.objects.all()
+    serializer_class = FavoritesSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+
+class FavoriteDetailView(generics.RetrieveDestroyAPIView):
+    queryset = Favorites.objects.all()
+    serializer_class = FavoritesSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+
+
+
+

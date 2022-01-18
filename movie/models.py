@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 from account.models import MyUser
@@ -32,17 +33,17 @@ class Image(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='images')
 
 
-RATING_CHOICES = (
-    (1, '1'),
-    (2, '2'),
-    (3, '3'),
-    (4, '4'),
-    (5, '5'),
-)
+# RATING_CHOICES = (
+#     (1, '1'),
+#     (2, '2'),
+#     (3, '3'),
+#     (4, '4'),
+#     (5, '5'),
+# )
 
 
 class Review(models.Model):
-    rating = models.IntegerField(choices=RATING_CHOICES, blank=True, null=True)
+    # rating = models.IntegerField(choices=RATING_CHOICES, blank=True, null=True)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='reviews')
     owner = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='reviews')
     review = models.TextField()
@@ -61,6 +62,7 @@ class Review(models.Model):
 #     owner = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='favourites')
 #     favorite = models.BooleanField(default=True)
 
+
 class Likes(models.Model):
     likes = models.BooleanField(default=False)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='likes')
@@ -68,3 +70,21 @@ class Likes(models.Model):
 
     def __str__(self):
         return str(self.likes)
+
+
+class Rating(models.Model):
+    owner = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='rating')
+    rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], default=0,)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="rating")
+
+    def __str__(self):
+        return f'{self.rating} - {self.movie}'
+
+
+class Favorites(models.Model):
+    owner = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='favorites')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='favorites')
+    favorites = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'{self.favorites} - {self.movie}'

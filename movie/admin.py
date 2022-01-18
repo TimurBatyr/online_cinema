@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Genre, Movie, Image, Review, Likes
+from .models import Genre, Movie, Image, Review, Likes, Rating, Favorites
 
 
 class ImageInLine(admin.TabularInline):
@@ -17,5 +17,6 @@ class MovieAdmin(admin.ModelAdmin):
 admin.site.register(Genre)
 admin.site.register(Review)
 admin.site.register(Likes)
-
+admin.site.register(Rating)
+admin.site.register(Favorites)
 
