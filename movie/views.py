@@ -4,10 +4,21 @@ from rest_framework.filters import SearchFilter
 
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly
 
+
 from .models import Genre, Movie, Image, Review, Likes, Rating, Favorites
 from .serializers import GenreSerializer, MovieSerializer, ImageSerializer, ReviewSerializer, LikesSerializer, \
     RatingSerializer, FavoritesSerializer
 from .permissions import IsAuthorPermission, PermissionMixin
+
+
+# class MyPaginationClass(PageNumberPagination):
+#     page_size = 4
+#
+#     def get_paginated_response(self, data):
+#         for i in range(self.page_size):
+#             text = data[i]['description']
+#             data[i]['description'] = text[:20] + '...'
+#         return super().get_paginated_response(data)
 
 
 class GenreListView(generics.ListAPIView):
@@ -29,8 +40,9 @@ class MovieViewSet(PermissionMixin, viewsets.ModelViewSet):
     serializer_class = MovieSerializer
 
 
+
 #CRUD
-class MovieImagesViewSet(viewsets.ModelViewSet):
+class MovieImagesViewSet(PermissionMixin, viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
 

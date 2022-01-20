@@ -80,11 +80,3 @@ class ChangePasswordSerializer(serializers.Serializer):
         user.set_password(new_pass)
         user.save()
 
-
-
-
-
-# class ChangePasswordSerializer(serializers.Serializer):
-#     model = MyUser
-#     old_password = serializers.CharField(required=True)
-#     new_password = serializers.CharField(required=True)

@@ -53,6 +53,5 @@ urlpatterns = [
     path('api/v1/favorites/', FavoritesListView.as_view()),
     path('api/v1/favorites/create/', FavoritesCreateView.as_view()),
     path('api/v1/favorites/<int:pk>/', FavoriteDetailView.as_view()),
-    # path('api/v1/auth/', include('rest_framework_social_oauth2.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

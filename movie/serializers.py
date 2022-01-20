@@ -66,8 +66,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         return review
 
 
-
-
 class LikesSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
 
