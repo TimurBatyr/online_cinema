@@ -64,23 +64,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         owner = request.user
         review = Review.objects.create(owner=owner, **validated_data)
         return review
-        # movie = self.context.get('movie')
-        # validated_data['user'] = owner
-        # validated_data['product'] = movie
-        # return super().create(validated_data)
 
-#
-# class FavoriteSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         model = Favorite
-#         fields = '__all__'
-#
-#     def to_representation(self, instance):
-#         representation = super().to_representation(instance)
-#         representation['owner'] = instance.owner.email
-#         representation['movie'] = instance.movie.title
-#         return representation
+
 
 
 class LikesSerializer(serializers.ModelSerializer):
